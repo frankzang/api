@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Student {
+  id           String         @unique @default(uuid())
+  email        String         @unique
+  password     String
+  name         String
+  lastname     String
+  phone_number String
+  cpf          String
+  courses      Course[]
+  Subscription Subscription[]
+}
+
+model Teacher {
+  id           String   @unique @default(uuid())
+  email        String   @unique
+  password     String
+  name         String
+  lastname     String
+  phone_number String
+  cpf          String
+  courses      Course[]
+}
+
+model Course {
+  id           String         @unique @default(uuid())
+  name         String
+  description  String
+  cover_img    String
+  price        Float
+  duration     Int
+  teacher      Teacher        @relation(fields: [teacherId], references: [id])
+  teacherId    String
+  Student      Student?       @relation(fields: [studentEmail], references: [email])
+  studentEmail String?
+  Class        Class[]
+  Subscription Subscription[]
+}
+
+model Class {
+  id       String    @unique @default(uuid())
+  course   Course    @relation(fields: [courseId], references: [id])
+  content  Content[]
+  courseId String
+}
+
+model Content {
+  id      String @id @default(uuid())
+  course  Class  @relation(fields: [classId], references: [id])
+  classId String
+}
+
+model Subscription {
+  id        String  @id @default(uuid())
+  student   Student @relation(fields: [studentId], references: [id])
+  course    Course  @relation(fields: [courseId], references: [id])
+  studentId String
+  courseId  String
+}
